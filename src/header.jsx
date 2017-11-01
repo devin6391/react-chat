@@ -13,8 +13,10 @@ import fire from './fire';
 
 const styles = theme => ({
   root: {
-    marginTop: theme.spacing.unit * 3,
+    marginTop: theme.spacing.unit * 0,
     width: '100%',
+    position: "fixed",
+    top: 0
   },
   flex: {
     flex: 1,
@@ -39,7 +41,60 @@ export default class Header extends Component {
       loggedIn: false
     }
   }
+
+  componentDidMount() {
+    var user = JSON.parse(window.localStorage.getItem('fireAuthInfo'));
+    var credential = JSON.parse(window.localStorage.getItem('fireCredential'));
+    if (user && user.uid && credential) {
+      console.log("USER is logged in");
+      this.setState({loggedIn: true});
+    } else {
+      console.log("USER is not logged in");
+    }
+  }
+
+  signin = (e) => {
+    if(e) e.preventDefault();
+    var provider = new firebase.auth.GoogleAuthProvider();
+    let fireAuth = firebase.auth();
+    fireAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+    fireAuth.signInWithPopup(provider)
+      .then(result => {
+        console.log("google signin result", result);
+        this.setState((prevState, props) => {
+          return Object.assign({}, prevState, {
+            loggedIn: true
+          })
+        }, () => {
+          window.localStorage.setItem('fireAuthInfo', JSON.stringify(firebase.auth().currentUser));
+          window.localStorage.setItem('fireCredential', JSON.stringify(result.credential));
+        });
+      })
+      .catch(e => {
+        console.error("signin unseccessful because of :", e);
+      });
+  }
+
+  signout = e => {
+    e.preventDefault();
+    let self = this;
+    firebase.auth().signOut().then(function() {
+      console.log("signout successful");
+      self.setState((prevState, props) => {
+        return Object.assign({}, prevState, {
+          loggedIn: false
+        })
+      }, () => {
+        window.localStorage.removeItem('fireAuthInfo');
+        window.localStorage.removeItem('fireCredential');
+      });
+    }).catch(function(error) {
+      console.error("signout unseccessful", error);
+    });
+  }
+
   render() {
+    let classes = this.props.classes;
     return (
       <div className={classes.root}>
         <AppBar position="static">
@@ -47,8 +102,20 @@ export default class Header extends Component {
             <Typography type="title" color="inherit" className={classes.flex}>
               React Chat
             </Typography>
-            <Button color="contrast" className={this.state.loggedIn ? classes.hidden: classes.noHide}>Login</Button>
-            <Button color="contrast" className={this.state.loggedIn ? classes.noHide: classes.hidden}>Logout</Button>
+            <Button
+              color="contrast"
+              className={this.state.loggedIn ? classes.hidden: classes.noHide}
+              onClick={this.signin}
+            >
+              Login
+            </Button>
+            <Button
+              color="contrast"
+              className={this.state.loggedIn ? classes.noHide: classes.hidden}
+              onClick={this.signout}
+            >
+              Logout
+            </Button>
           </Toolbar>
         </AppBar>
       </div>
