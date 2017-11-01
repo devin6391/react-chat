@@ -1,0 +1,22 @@
+{
+  "name": "react-chat",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "firebase": "^4.6.0",
+    "material-ui": "^1.0.0-beta.19",
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0",
+    "typeface-roboto": "^0.0.43"
+  },
+  "devDependencies": {
+    "react-scripts": "1.0.16"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "deploy": "firebase deploy"
+  }
+}
