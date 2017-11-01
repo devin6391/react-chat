@@ -109,8 +109,6 @@ export default class Header extends Component {
             >
               Login
             </Button>
-              Logout
-            </Button>
           </Toolbar>
         </AppBar>
       </div>
