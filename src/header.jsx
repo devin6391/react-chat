@@ -109,11 +109,6 @@ export default class Header extends Component {
             >
               Login
             </Button>
-            <Button
-              color="contrast"
-              className={this.state.loggedIn ? classes.noHide: classes.hidden}
-              onClick={this.signout}
-            >
               Logout
             </Button>
           </Toolbar>
