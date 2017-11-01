@@ -62,6 +62,15 @@ export default class ChatView extends Component {
     }
     if(navigator.onLine) {
       document.addEventListener("dbReady", this.populateFromFirebase);
+      let self = this;
+      firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+          self.setState({
+            messages: []
+          })
+          self.populateFromFirebase();
+        }
+      });
     } else {
       document.addEventListener("dbReady", this.populateFromLocalDb);
     }
@@ -108,7 +117,7 @@ export default class ChatView extends Component {
     }).catch(e => console.error(e));
   }
 
-  componentWillMount() {
+  componentWillUnmount() {
     document.removeEventListener("dbReady", this.populateFromFirebase);
     document.removeEventListener("dbReady", this.populateFromLocalDb);
   }

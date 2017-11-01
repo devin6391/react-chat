@@ -64,12 +64,14 @@ export default class MsgInput extends Component {
     this.state = {
       message: "",
       otherValues: {},
-      loggedIn: false
+      loggedIn: false,
+      online: true
     }
     this.inputEl = null;
   }
 
   componentDidMount() {
+    this.updateOnlineStatus();
     var user = JSON.parse(window.localStorage.getItem('fireAuthInfo'));
     if(user && user.uid) {
       this.setState({
@@ -99,6 +101,26 @@ export default class MsgInput extends Component {
         })
       }
     });
+
+    window.addEventListener('online',  this.updateOnlineStatus);
+    window.addEventListener('offline', this.updateOnlineStatus);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('online',  this.updateOnlineStatus);
+    window.removeEventListener('offline', this.updateOnlineStatus);
+  }
+
+  updateOnlineStatus = (e) => {
+    if(navigator.onLine) {
+      this.setState({
+        online: true
+      })
+    } else {
+      this.setState({
+        online: false
+      })
+    }
   }
 
   sendMessage = (e) => {
@@ -146,7 +168,7 @@ export default class MsgInput extends Component {
             aria-label="add"
             className={classes.button}
             onClick={this.sendMessage}
-            disabled={!this.state.loggedIn}
+            disabled={!(this.state.loggedIn && this.state.online)}
           >
             <AddIcon />
           </Button>
