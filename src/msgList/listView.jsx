@@ -85,22 +85,26 @@ export default class ChatView extends Component {
         this.setState({noValue: true});
       }
     });
-    messagesRef.on('child_added', snapshot => {
-      /* Update React state when message is added at Firebase Database */
-      console.log("Child added event received from firebase", snapshot.val());
-      let message = { text: snapshot.val(), id: snapshot.key };
-      this.setState((prevState) => {
-        return Object.assign({}, prevState, {
-          messages: prevState.messages.concat([message]),
-          loader: false
-        })
-      }, () => {
-        this.rootEl.scrollTop = this.rootEl.scrollHeight;
-      });
-      addDataToDb(message)
-      .then(result => console.log("message successfully added to db"))
-      .catch(e => console.error("Error occurred in db during txn", e));
+    messagesRef.off('child_added', this.saveFirebaseSnapshot);
+    messagesRef.on('child_added', this.saveFirebaseSnapshot);
+  }
+
+  saveFirebaseSnapshot = snapshot => {
+    /* Update React state when message is added at Firebase Database */
+    console.log("Child added event received from firebase", snapshot.val());
+    let message = { text: snapshot.val(), id: snapshot.key };
+    this.setState((prevState) => {
+      return Object.assign({}, prevState, {
+        messages: prevState.messages.concat([message]),
+        loader: false
+      })
+    }, () => {
+      this.rootEl.scrollTop = this.rootEl.scrollHeight;
     });
+    addDataToDb(message)
+    .then(result => console.log("message successfully added to db"))
+    .catch(e => console.error("Error occurred in db during txn", e));
+    snapshot.ref().remove();
   }
 
   populateFromLocalDb = () => {
