@@ -14,13 +14,33 @@ import './App.css';
 const theme = createMuiTheme();
 
 class App extends Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      online: true,
+    }
+  }
+
+  componentDidMount() {
+    var connectedRef = firebase.database().ref(".info/connected");
+    var self = this;
+    connectedRef.on("value", function(snap) {
+      if (snap.val() === true) {
+        self.setState({online: true});
+      } else {
+        self.setState({online: false});
+      }
+    });
+  }
+
   render() {
     return (
       <MuiThemeProvider theme={theme}>
         <div className="App">
-          <Header />
-          <ChatView />
-          <MsgInput />
+          <Header online={this.state.online} />
+          <ChatView online={this.state.online} />
+          <MsgInput online={this.state.online} />
         </div>
       </MuiThemeProvider>
     );

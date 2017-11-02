@@ -53,6 +53,7 @@ export default class ChatView extends Component {
     }
     this.rootEl = null;
   }
+
   componentDidMount() {
     var user = JSON.parse(window.localStorage.getItem('fireAuthInfo'));
     if(user && user.uid) {
@@ -73,6 +74,34 @@ export default class ChatView extends Component {
       });
     } else {
       document.addEventListener("dbReady", this.populateFromLocalDb);
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    let self = this;
+    let timer = null;
+    if(prevProps.online != this.props.online) {
+      if(timer) {
+        window.clearTimeout(timer);
+        timer = null;
+      }
+      if(this.props.online) {
+        timer = window.setTimeout(() => {
+          self.setState({
+            messages: [],
+            loader: true
+          });
+          self.populateFromFirebase();
+        }, 1000);
+      } else {
+        timer = window.setTimeout(() => {
+          self.setState({
+            messages: [],
+            loader: true
+          });
+          self.populateFromLocalDb();
+        }, 1000);
+      }
     }
   }
 
@@ -104,7 +133,6 @@ export default class ChatView extends Component {
     addDataToDb(message)
     .then(result => console.log("message successfully added to db"))
     .catch(e => console.error("Error occurred in db during txn", e));
-    snapshot.ref().remove();
   }
 
   populateFromLocalDb = () => {
