@@ -51,6 +51,9 @@ const styles = theme => ({
     "& span": {
       textAlign: "left"
     }
+  },
+  chatText: {
+    fontSize: 20
   }
 });
 
@@ -61,10 +64,21 @@ export default class ChatItem extends Component {
     this.state = {
       time: null
     }
+    this.intervalRef = null;
   }
 
   componentDidMount() {
+    let time = moment(this.props.message.dateTime).fromNow();
+    this.setState({time});
+    this.intervalRef = setInterval(() => {
+      let time = moment(this.props.message.dateTime).fromNow();
+      this.setState({time});
+    }, 20000)
+  }
 
+  componentWillUnmount() {
+    window.clearInterval(this.intervalRef);
+    this.intervalRef = null;
   }
 
   render() {
@@ -84,13 +98,15 @@ export default class ChatItem extends Component {
               </Avatar>
             }
             title={message.displayName.toString().toUpperCase()}
-            subheader={moment(message.dateTime).format("dddd, MMMM Do YYYY, h:mm:ss a")}
+            subheader={this.state.time}
             classes={{
               root: classes.cardContentRoot
             }}
           />
           <CardContent>
-            <Typography component="p">{message.msg}</Typography>
+            <Typography component="p" classes={{
+                root: classes.chatText
+              }}>{message.msg}</Typography>
           </CardContent>
         </Card>
       </div>
