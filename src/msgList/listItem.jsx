@@ -20,9 +20,12 @@ const styles = theme => ({
     borderRadius: 30,
     margin: 10,
     maxWidth: "calc(100vw - 50px)",
-    boxShadow: "5px 0px 6px 0px rgba(0, 0, 0, 0.2), 0px 7px 1px 0px rgba(13, 5, 0, 0.14), 0px 4px 12px 8px rgba(0, 0, 0, 0.12)",
+    boxShadow: "5px 0px -1px 0px rgba(0, 0, 0, 0.2), 0px 7px 1px 0px rgba(13, 5, 0, 0.14), 0px 4px 12px 8px rgba(0, 0, 0, 0.12)",
+    "border-top-left-radius": 0,
     "&.margin": {
-      marginLeft: 40
+      marginLeft: 40,
+      "border-top-left-radius": 30,
+      "border-top-right-radius": 0,
     }
   },
   media: {
@@ -56,9 +59,14 @@ export default class ChatItem extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      messages: []
+      time: null
     }
   }
+
+  componentDidMount() {
+
+  }
+
   render() {
     let classes = this.props.classes;
     let message = this.props.message;

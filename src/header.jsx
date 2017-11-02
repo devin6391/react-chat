@@ -30,6 +30,18 @@ const styles = theme => ({
   },
   noHide: {
     display: "flex"
+  },
+  status: {
+    display: "inline-flex",
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    "&.online": {
+      backgroundColor: "#57da57",
+    },
+    "&.offline": {
+      backgroundColor: "#f70b0b",
+    }
   }
 });
 
@@ -109,6 +121,7 @@ export default class Header extends Component {
             >
               Login
             </Button>
+            <div className={this.props.online ? `online ${classes.status}` : `offline ${classes.status}`}></div>
           </Toolbar>
         </AppBar>
       </div>

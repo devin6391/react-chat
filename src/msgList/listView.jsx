@@ -49,9 +49,11 @@ export default class ChatView extends Component {
       messages: [],
       loader: true,
       noValue: false,
-      ownUid: null
+      ownUid: null,
     }
+    this.appReadyForNotification = false;
     this.rootEl = null;
+    this.notificationSound = new Audio(`${process.env.PUBLIC_URL}/notify.mp3`);
   }
 
   componentDidMount() {
@@ -70,10 +72,14 @@ export default class ChatView extends Component {
             messages: []
           })
           self.populateFromFirebase();
+          setTimeout(() => {
+            self.appReadyForNotification = true;
+          }, 20000);
         }
       });
     } else {
       document.addEventListener("dbReady", this.populateFromLocalDb);
+      this.appReadyForNotification = false;
     }
   }
 
@@ -92,15 +98,19 @@ export default class ChatView extends Component {
             loader: true
           });
           self.populateFromFirebase();
-        }, 1000);
+        }, 2000);
+        setTimeout(() => {
+          self.appReadyForNotification = true;
+        }, 20000);
       } else {
         timer = window.setTimeout(() => {
           self.setState({
             messages: [],
-            loader: true
+            loader: true,
           });
+          self.appReadyForNotification = false;
           self.populateFromLocalDb();
-        }, 1000);
+        }, 2000);
       }
     }
   }
@@ -129,6 +139,10 @@ export default class ChatView extends Component {
       })
     }, () => {
       this.rootEl.scrollTop = this.rootEl.scrollHeight;
+      if(this.appReadyForNotification) {
+        this.notificationSound.play();
+        navigator.vibrate && navigator.vibrate(200);
+      }
     });
     addDataToDb(message)
     .then(result => console.log("message successfully added to db"))
